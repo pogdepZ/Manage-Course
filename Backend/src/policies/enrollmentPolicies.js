@@ -16,6 +16,12 @@ function registerEnrollmentPolicies(policyEngine) {
 
   policyEngine.register({
     resourceType: 'enrollment',
+    actions: ['read'],
+    evaluate: ({ subject, hasResource }) => subject.role === 'teacher' && !hasResource
+  });
+
+  policyEngine.register({
+    resourceType: 'enrollment',
     actions: ['create'],
     evaluate: ({ subject, resource }) =>
       subject.role === 'student' &&

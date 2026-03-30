@@ -57,8 +57,9 @@ npm run dev
 5. `DELETE /api/lessons/:lessonId`
 
 ### Enrollments
-1. `POST /api/enrollments/enroll`
-2. `GET /api/enrollments`
+1. `POST /api/enrollments`
+2. `POST /api/enrollments/enroll` (backward compatibility alias)
+3. `GET /api/enrollments`
 
 ## 5. Workflow Tong The He Thong (End-to-End)
 

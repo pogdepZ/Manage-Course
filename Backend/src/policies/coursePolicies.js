@@ -14,7 +14,7 @@ function registerCoursePolicies(policyEngine) {
   policyEngine.register({
     resourceType: 'course',
     actions: ['read'],
-    evaluate: ({ subject, resource }) => subject.role === 'teacher' && !resource
+    evaluate: ({ subject, hasResource }) => subject.role === 'teacher' && !hasResource
   });
 
   // Example ABAC rule: teacher can update only own courses.

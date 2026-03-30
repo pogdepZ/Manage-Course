@@ -4,6 +4,7 @@ function policyMiddleware({ resourceType, action, loadResource }) {
   return async function checkPolicy(request, _reply) {
     const subject = request.user;
     const { policyEngine } = request.server.container;
+    const hasResource = Boolean(loadResource);
 
     let resource = null;
     if (loadResource) {
@@ -14,7 +15,8 @@ function policyMiddleware({ resourceType, action, loadResource }) {
       subject,
       action,
       resourceType,
-      resource
+      resource,
+      hasResource
     });
 
     if (!allowed) {

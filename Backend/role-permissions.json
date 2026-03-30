@@ -68,7 +68,7 @@
         },
         "read_list": {
           "allowed": true,
-          "scope": "only courses where createdBy == subject.id"
+          "scope": "all"
         },
         "read_detail": {
           "allowed": true,
@@ -93,8 +93,8 @@
           "condition": "target course is owned by teacher"
         },
         "read_list": {
-          "allowed": false,
-          "reason": "current policy requires resource, list has no resource"
+          "allowed": true,
+          "scope": "only lessons in courses where course.createdBy == subject.id"
         },
         "read_detail": {
           "allowed": true,
@@ -115,8 +115,8 @@
           "condition": "courseCreatedBy == subject.id"
         },
         "read_list": {
-          "allowed": false,
-          "reason": "current policy requires resource, list has no resource"
+          "allowed": true,
+          "scope": "only enrollments from courses where course.createdBy == subject.id"
         }
       },
       "auth": {
@@ -139,7 +139,7 @@
         },
         "read_list": {
           "allowed": true,
-          "scope": "all"
+          "scope": "only enrolled courses"
         },
         "read_detail": {
           "allowed": true,
@@ -201,8 +201,8 @@
   },
   "data_scope_rules": {
     "admin": "no filter",
-    "teacher": "{ createdBy: subject.id } for courses",
-    "student": "none for course list, { _id: { $in: enrolledCourseIds } } for course detail"
+    "teacher": "course list = all, course detail/update/delete = { createdBy: subject.id }",
+    "student": "{ _id: { $in: enrolledCourseIds } } for courses"
   },
   "policy_source_files": [
     "src/policies/coursePolicies.js",

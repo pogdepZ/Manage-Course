@@ -1,12 +1,30 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import { http } from '../api/http';
 import { useToast } from '../stores/toastStore';
-import { formatDate } from '../utils/helpers';
-import { enrollmentList } from '../utils/mockData';
+import { extractErrorMessage, formatDate } from '../utils/helpers';
 
 export default function EnrollmentsPage() {
   const toast = useToast();
   const [form, setForm] = useState({ userId: '', courseId: '' });
+  const [items, setItems] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [pending, setPending] = useState(false);
+
+  const fetchEnrollments = async () => {
+    setLoading(true);
+    try {
+      const response = await http.get('/enrollments');
+      setItems(response.data?.data || response.data || []);
+    } catch (error) {
+      toast.error(extractErrorMessage(error, 'Load enrollments failed'));
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchEnrollments();
+  }, []);
 
   const handleChange = (event) => {
     const { name, value } = event.target;
@@ -18,10 +36,12 @@ export default function EnrollmentsPage() {
     setPending(true);
 
     try {
+      await http.post('/enrollments', form);
       toast.success(`Enrollment submitted for ${form.userId} -> ${form.courseId}`);
       setForm({ userId: '', courseId: '' });
+      fetchEnrollments();
     } catch (error) {
-      toast.error(error?.response?.data?.message || 'Enroll failed');
+      toast.error(extractErrorMessage(error, 'Enroll failed'));
     } finally {
       setPending(false);
     }
@@ -71,13 +91,20 @@ export default function EnrollmentsPage() {
               </tr>
             </thead>
             <tbody>
-              {enrollmentList.map((item) => (
-                <tr key={item.id}>
+              {items.map((item) => (
+                <tr key={item._id || item.id}>
                   <td>{item.userId}</td>
                   <td>{item.courseId}</td>
                   <td>{formatDate(item.createdAt)}</td>
                 </tr>
               ))}
+              {!loading && items.length === 0 ? (
+                <tr>
+                  <td colSpan={3}>
+                    <p className="empty-state">No enrollments found for your scope.</p>
+                  </td>
+                </tr>
+              ) : null}
             </tbody>
           </table>
         </div>

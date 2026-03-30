@@ -3,7 +3,7 @@ const policyMiddleware = require('../middleware/policyMiddleware');
 function enrollmentRoutes(fastify, opts, done) {
   const { enrollmentController } = opts.controllers;
 
-  fastify.post('/enroll', {
+  const enrollRouteOptions = {
     preHandler: [
       policyMiddleware({
         resourceType: 'enrollment',
@@ -17,7 +17,6 @@ function enrollmentRoutes(fastify, opts, done) {
               courseCreatedBy: null
             };
           }
-
           return {
             userId: request.body.userId,
             courseId: request.body.courseId,
@@ -27,7 +26,13 @@ function enrollmentRoutes(fastify, opts, done) {
       })
     ],
     handler: enrollmentController.enroll
-  });
+  };
+
+  // RESTful create endpoint aligned with role-permissions map.
+  fastify.post('/', enrollRouteOptions);
+
+  // Backward compatible alias for existing clients.
+  fastify.post('/enroll', enrollRouteOptions);
 
   fastify.get('/', {
     preHandler: [

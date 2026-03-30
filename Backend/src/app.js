@@ -22,6 +22,7 @@ function buildApp() {
   app.get('/health', async () => ({ status: 'ok' }));
 
   return app;
+  
 }
 
 module.exports = buildApp;
