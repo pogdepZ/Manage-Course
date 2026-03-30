@@ -32,7 +32,7 @@ class EnrollmentService {
     }
 
     if (subject.role === 'teacher') {
-      const courses = await this.courseRepository.findAllScoped(subject);
+      const courses = await this.courseRepository.findOwnedCourses(subject);
       const rows = await Promise.all(courses.map((course) => this.enrollmentRepository.findByCourseId(course._id)));
       return rows.flat();
     }

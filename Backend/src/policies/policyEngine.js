@@ -1,26 +1,53 @@
+const fs = require('fs');
+const path = require('path');
+
 class PolicyEngine {
   constructor() {
-    this.policies = [];
+    this.permissions = {};
+    this.loadPermissions();
   }
 
-  register(policy) {
-    this.policies.push(policy);
+  loadPermissions() {
+    const filePath = path.join(__dirname, '../../role-permissions.json');
+    const data = JSON.parse(fs.readFileSync(filePath, 'utf8'));
+    this.permissions = data.roles;
   }
 
   can({ subject, action, resourceType, resource }) {
-    for (const policy of this.policies) {
-      const applies = policy.resourceType === resourceType && policy.actions.includes(action);
-      if (!applies) {
-        continue;
-      }
-
-      const allowed = policy.evaluate({ subject, action, resource });
-      if (allowed) {
-        return true;
-      }
+    if (!subject || !subject.role) return false;
+    
+    // For reads: determine if it's a list (no resource) or detail (resource)
+    let jsonAction = action;
+    if (action === 'read') {
+      jsonAction = resource ? 'read_detail' : 'read_list';
     }
 
-    return false;
+    const rolePerms = this.permissions[subject.role];
+    if (!rolePerms) return false;
+
+    const resourcePerms = rolePerms[resourceType];
+    if (!resourcePerms) return false;
+
+    const actionPerm = resourcePerms[jsonAction];
+    if (!actionPerm || !actionPerm.allowed) return false;
+
+    // Evaluate dynamic JS condition from JSON if present
+    if (actionPerm.condition) {
+      if (!resource) return false; // Hard fail if condition relies on undefined resource
+
+      try {
+        // Creates a dynamic function interpreting the string condition:
+        // func(subject, resource) => return expression;
+        const evaluateCondition = new Function('subject', 'resource', `return ${actionPerm.condition};`);
+        const result = evaluateCondition(subject, resource);
+        return result === true;
+      } catch (error) {
+        console.error(`[PolicyEngine] Condition evaluation failed:`, error.message);
+        return false;
+      }
+    }
+    
+    return true;
   }
 }
 

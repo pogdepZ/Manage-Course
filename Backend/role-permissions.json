@@ -1,216 +1,124 @@
 {
-  "version": "1.0.0",
-  "description": "Role permission snapshot for current backend implementation",
+  "version": "2.0.0",
+  "description": "Dynamic Role permission engine configuration",
   "roles": {
     "admin": {
       "course": {
-        "create": {
-          "allowed": true
-        },
-        "read_list": {
-          "allowed": true,
-          "scope": "all"
-        },
-        "read_detail": {
-          "allowed": true
-        },
-        "update": {
-          "allowed": true
-        },
-        "delete": {
-          "allowed": true
-        }
+        "create": { "allowed": true },
+        "read_list": { "allowed": true, "scope": "all" },
+        "read_detail": { "allowed": true },
+        "update": { "allowed": true },
+        "delete": { "allowed": true }
       },
       "lesson": {
-        "create": {
-          "allowed": true
-        },
-        "read_list": {
-          "allowed": true,
-          "scope": "all"
-        },
-        "read_detail": {
-          "allowed": true
-        },
-        "update": {
-          "allowed": true
-        },
-        "delete": {
-          "allowed": true
-        }
+        "create": { "allowed": true },
+        "read_list": { "allowed": true, "scope": "all" },
+        "read_detail": { "allowed": true },
+        "update": { "allowed": true },
+        "delete": { "allowed": true }
       },
       "enrollment": {
-        "create": {
-          "allowed": true
-        },
-        "read_list": {
-          "allowed": true,
-          "scope": "all"
-        }
+        "create": { "allowed": true },
+        "read_list": { "allowed": true, "scope": "all" },
+        "read_detail": { "allowed": true },
+        "update": { "allowed": true },
+        "delete": { "allowed": true }
       },
       "auth": {
-        "register": {
-          "allowed": true
-        },
-        "login": {
-          "allowed": true
-        },
-        "refresh": {
-          "allowed": true
-        }
+        "register": { "allowed": true },
+        "login": { "allowed": true },
+        "refresh": { "allowed": true }
       }
     },
     "teacher": {
       "course": {
-        "create": {
-          "allowed": true,
-          "condition": "authenticated teacher"
-        },
-        "read_list": {
-          "allowed": true,
-          "scope": "all"
-        },
+        "create": { "allowed": true },
+        "read_list": { "allowed": true, "scope": "all" },
         "read_detail": {
           "allowed": true,
-          "condition": "resource.createdBy == subject.id"
+          "condition": "String(resource.createdBy) === String(subject.id) || (resource.teachers || []).some(t => String(t) === String(subject.id))"
         },
         "update": {
           "allowed": true,
-          "condition": "resource.createdBy == subject.id",
-          "notes": [
-            "createdBy is immutable",
-            "only title is updatable"
-          ]
+          "condition": "String(resource.createdBy) === String(subject.id) || (resource.teachers || []).some(t => String(t) === String(subject.id))"
         },
         "delete": {
           "allowed": true,
-          "condition": "resource.createdBy == subject.id"
+          "condition": "String(resource.createdBy) === String(subject.id) || (resource.teachers || []).some(t => String(t) === String(subject.id))"
         }
       },
       "lesson": {
-        "create": {
+        "create": { 
           "allowed": true,
-          "condition": "target course is owned by teacher"
+          "condition": "String(resource.courseCreatedBy) === String(subject.id) || (resource.courseTeachers || []).some(t => String(t) === String(subject.id))"
         },
-        "read_list": {
-          "allowed": true,
-          "scope": "only lessons in courses where course.createdBy == subject.id"
-        },
+        "read_list": { "allowed": true, "scope": "owned courses" },
         "read_detail": {
           "allowed": true,
-          "condition": "lesson.courseCreatedBy == subject.id"
+          "condition": "String(resource.courseCreatedBy) === String(subject.id) || (resource.courseTeachers || []).some(t => String(t) === String(subject.id))"
         },
         "update": {
           "allowed": true,
-          "condition": "lesson.courseCreatedBy == subject.id"
+          "condition": "String(resource.courseCreatedBy) === String(subject.id) || (resource.courseTeachers || []).some(t => String(t) === String(subject.id))"
         },
         "delete": {
           "allowed": true,
-          "condition": "lesson.courseCreatedBy == subject.id"
+          "condition": "String(resource.courseCreatedBy) === String(subject.id) || (resource.courseTeachers || []).some(t => String(t) === String(subject.id))"
         }
       },
       "enrollment": {
-        "create": {
+        "create": { 
           "allowed": true,
-          "condition": "courseCreatedBy == subject.id"
+          "condition": "String(resource.courseCreatedBy) === String(subject.id) || (resource.courseTeachers || []).some(t => String(t) === String(subject.id))"
         },
-        "read_list": {
+        "read_list": { "allowed": true, "scope": "owned courses enrollments" },
+        "read_detail": {
           "allowed": true,
-          "scope": "only enrollments from courses where course.createdBy == subject.id"
+          "condition": "String(resource.courseCreatedBy) === String(subject.id) || (resource.courseTeachers || []).some(t => String(t) === String(subject.id))"
         }
       },
       "auth": {
-        "register": {
-          "allowed": true
-        },
-        "login": {
-          "allowed": true
-        },
-        "refresh": {
-          "allowed": true
-        }
+        "register": { "allowed": true },
+        "login": { "allowed": true },
+        "refresh": { "allowed": true }
       }
     },
     "student": {
       "course": {
-        "create": {
-          "allowed": false,
-          "reason": "service blocks students"
-        },
-        "read_list": {
-          "allowed": true,
-          "scope": "only enrolled courses"
-        },
-        "read_detail": {
-          "allowed": true,
-          "scope": "only enrolled courses"
-        },
-        "update": {
-          "allowed": false,
-          "reason": "not granted by policy"
-        },
-        "delete": {
-          "allowed": false,
-          "reason": "not granted by policy"
-        }
+        "create": { "allowed": false },
+        "read_list": { "allowed": true, "scope": "all" },
+        "read_detail": { "allowed": true, "scope": "only enrolled" },
+        "update": { "allowed": false },
+        "delete": { "allowed": false }
       },
       "lesson": {
-        "create": {
-          "allowed": false,
-          "reason": "service blocks students"
-        },
-        "read_list": {
-          "allowed": true,
-          "scope": "only lessons in enrolled courses"
-        },
-        "read_detail": {
-          "allowed": true,
-          "scope": "only lessons in enrolled courses"
-        },
-        "update": {
-          "allowed": false,
-          "reason": "not granted by policy"
-        },
-        "delete": {
-          "allowed": false,
-          "reason": "not granted by policy"
-        }
+        "create": { "allowed": false },
+        "read_list": { "allowed": true, "scope": "enrolled" },
+        "read_detail": { "allowed": true, "scope": "enrolled" },
+        "update": { "allowed": false },
+        "delete": { "allowed": false }
       },
       "enrollment": {
         "create": {
           "allowed": true,
-          "condition": "payload.userId must equal subject.id"
+          "condition": "String(resource.userId) === String(subject.id)"
         },
-        "read_list": {
+        "read_list": { "allowed": true, "scope": "own enrollments" },
+        "read_detail": {
           "allowed": true,
-          "scope": "only subject.id enrollments"
+          "condition": "String(resource.userId) === String(subject.id)"
         }
       },
       "auth": {
-        "register": {
-          "allowed": true
-        },
-        "login": {
-          "allowed": true
-        },
-        "refresh": {
-          "allowed": true
-        }
+        "register": { "allowed": true },
+        "login": { "allowed": true },
+        "refresh": { "allowed": true }
       }
     }
   },
   "data_scope_rules": {
     "admin": "no filter",
-    "teacher": "course list = all, course detail/update/delete = { createdBy: subject.id }",
-    "student": "{ _id: { $in: enrolledCourseIds } } for courses"
-  },
-  "policy_source_files": [
-    "src/policies/coursePolicies.js",
-    "src/policies/lessonPolicies.js",
-    "src/policies/enrollmentPolicies.js",
-    "src/utils/dataScope.js",
-    "src/services/CourseService.js",
-    "src/services/LessonService.js",
-    "src/services/EnrollmentService.js"
-  ]
+    "teacher": "course list = all, course detail/update/delete = { $or: [{ createdBy: subject.id }, { teachers: subject.id }] }",
+    "student": "course list = all, course detail = { _id: { $in: enrolledCourseIds } }"
+  }
 }

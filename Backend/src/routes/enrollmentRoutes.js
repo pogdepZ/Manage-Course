@@ -20,7 +20,8 @@ function enrollmentRoutes(fastify, opts, done) {
           return {
             userId: request.body.userId,
             courseId: request.body.courseId,
-            courseCreatedBy: course.createdBy
+            courseCreatedBy: course.createdBy,
+            courseTeachers: course.teachers
           };
         }
       })

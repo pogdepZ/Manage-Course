@@ -14,7 +14,8 @@ async function buildLessonPolicyResource(request) {
   return {
     lessonId: lesson._id,
     courseId: course._id,
-    courseCreatedBy: course.createdBy
+    courseCreatedBy: course.createdBy,
+    courseTeachers: course.teachers
   };
 }
 
@@ -52,7 +53,8 @@ function lessonRoutes(fastify, opts, done) {
 
           return {
             courseId: course._id,
-            courseCreatedBy: course.createdBy
+            courseCreatedBy: course.createdBy,
+            courseTeachers: course.teachers
           };
         }
       })

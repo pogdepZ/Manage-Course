@@ -24,6 +24,11 @@ class CourseRepository {
     return Course.find(scopeFilter).sort({ createdAt: -1 }).populate('createdBy', 'name').populate('teachers', 'name');
   }
 
+  async findOwnedCourses(subject) {
+    const scopeFilter = await buildCourseScopeFilter(subject, this.enrollmentRepository);
+    return Course.find(scopeFilter).select({ _id: 1 });
+  }
+
   // Data scope is merged directly into MongoDB query to enforce row-level filtering.
   async findByIdScoped(id, subject) {
     const scopeFilter = await buildCourseScopeFilter(subject, this.enrollmentRepository);
