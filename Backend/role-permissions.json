@@ -1,0 +1,102 @@
+{
+  "version": "1.0.0",
+  "description": "Role permission snapshot for current backend implementation",
+  "roles": {
+    "admin": {
+      "course": {
+        "create": { "allowed": true },
+        "read_list": { "allowed": true, "scope": "all" },
+        "read_detail": { "allowed": true },
+        "update": { "allowed": true },
+        "delete": { "allowed": true }
+      },
+      "lesson": {
+        "create": { "allowed": true },
+        "read_list": { "allowed": true, "scope": "all" },
+        "read_detail": { "allowed": true },
+        "update": { "allowed": true },
+        "delete": { "allowed": true }
+      },
+      "enrollment": {
+        "create": { "allowed": true },
+        "read_list": { "allowed": true, "scope": "all" }
+      },
+      "auth": {
+        "register": { "allowed": true },
+        "login": { "allowed": true },
+        "refresh": { "allowed": true }
+      }
+    },
+    "teacher": {
+      "course": {
+        "create": { "allowed": true, "condition": "authenticated teacher" },
+        "read_list": { "allowed": true, "scope": "only courses where createdBy == subject.id" },
+        "read_detail": { "allowed": true, "condition": "resource.createdBy == subject.id" },
+        "update": {
+          "allowed": true,
+          "condition": "resource.createdBy == subject.id",
+          "notes": [
+            "createdBy is immutable",
+            "only title is updatable"
+          ]
+        },
+        "delete": { "allowed": true, "condition": "resource.createdBy == subject.id" }
+      },
+      "lesson": {
+        "create": { "allowed": true, "condition": "target course is owned by teacher" },
+        "read_list": { "allowed": false, "reason": "current policy requires resource, list has no resource" },
+        "read_detail": { "allowed": true, "condition": "lesson.courseCreatedBy == subject.id" },
+        "update": { "allowed": true, "condition": "lesson.courseCreatedBy == subject.id" },
+        "delete": { "allowed": true, "condition": "lesson.courseCreatedBy == subject.id" }
+      },
+      "enrollment": {
+        "create": { "allowed": true, "condition": "courseCreatedBy == subject.id" },
+        "read_list": { "allowed": false, "reason": "current policy requires resource, list has no resource" }
+      },
+      "auth": {
+        "register": { "allowed": true },
+        "login": { "allowed": true },
+        "refresh": { "allowed": true }
+      }
+    },
+    "student": {
+      "course": {
+        "create": { "allowed": false, "reason": "service blocks students" },
+        "read_list": { "allowed": true, "scope": "only enrolled courses" },
+        "read_detail": { "allowed": true, "scope": "only enrolled courses" },
+        "update": { "allowed": false, "reason": "not granted by policy" },
+        "delete": { "allowed": false, "reason": "not granted by policy" }
+      },
+      "lesson": {
+        "create": { "allowed": false, "reason": "service blocks students" },
+        "read_list": { "allowed": true, "scope": "only lessons in enrolled courses" },
+        "read_detail": { "allowed": true, "scope": "only lessons in enrolled courses" },
+        "update": { "allowed": false, "reason": "not granted by policy" },
+        "delete": { "allowed": false, "reason": "not granted by policy" }
+      },
+      "enrollment": {
+        "create": { "allowed": true, "condition": "payload.userId must equal subject.id" },
+        "read_list": { "allowed": true, "scope": "only subject.id enrollments" }
+      },
+      "auth": {
+        "register": { "allowed": true },
+        "login": { "allowed": true },
+        "refresh": { "allowed": true }
+      }
+    }
+  },
+  "data_scope_rules": {
+    "admin": "no filter",
+    "teacher": "{ createdBy: subject.id } for courses",
+    "student": "{ _id: { $in: enrolledCourseIds } } for courses"
+  },
+  "policy_source_files": [
+    "src/policies/coursePolicies.js",
+    "src/policies/lessonPolicies.js",
+    "src/policies/enrollmentPolicies.js",
+    "src/utils/dataScope.js",
+    "src/services/CourseService.js",
+    "src/services/LessonService.js",
+    "src/services/EnrollmentService.js"
+  ]
+}

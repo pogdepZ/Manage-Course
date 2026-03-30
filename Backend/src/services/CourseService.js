@@ -29,7 +29,17 @@ class CourseService {
   }
 
   async update(subject, courseId, payload) {
-    const updated = await this.courseRepository.updateByIdScoped(courseId, payload, subject);
+    const updates = {};
+
+    if (typeof payload.title === 'string') {
+      updates.title = payload.title;
+    }
+
+    if (Object.keys(updates).length === 0) {
+      throw new AppError('No valid fields to update', 400);
+    }
+
+    const updated = await this.courseRepository.updateByIdScoped(courseId, updates, subject);
     if (!updated) {
       throw new AppError('Course not found or forbidden', 404);
     }
