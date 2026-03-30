@@ -11,6 +11,8 @@ import LoginPage from './pages/LoginPage';
 import NotFoundPage from './pages/NotFoundPage';
 import ProfilePage from './pages/ProfilePage';
 import RegisterPage from './pages/RegisterPage';
+import PermissionMatrixPage from './pages/PermissionMatrixPage';
+import RoleGate from './components/RoleGate';
 
 function RootRedirect() {
   const { isAuthenticated } = useAuth();
@@ -32,6 +34,14 @@ export default function App() {
           <Route path="courses/:courseId" element={<CourseDetailPage />} />
           <Route path="lessons" element={<LessonsPage />} />
           <Route path="enrollments" element={<EnrollmentsPage />} />
+          <Route
+            path="permissions"
+            element={
+              <RoleGate allow={['admin']} fallback={<Navigate to="/app/dashboard" replace />}>
+                <PermissionMatrixPage />
+              </RoleGate>
+            }
+          />
           <Route path="profile" element={<ProfilePage />} />
         </Route>
       </Route>

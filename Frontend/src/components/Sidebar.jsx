@@ -6,6 +6,7 @@ const menuByRole = {
     { to: '/app/courses', label: 'Courses' },
     { to: '/app/lessons', label: 'Lessons' },
     { to: '/app/enrollments', label: 'Enrollments' },
+    { to: '/app/permissions', label: 'Permissions' },
     { to: '/app/profile', label: 'Profile' },
   ],
   teacher: [

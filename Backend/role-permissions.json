@@ -142,7 +142,7 @@
     "student": {
       "course": {
         "create": {
-          "allowed": false
+          "allowed": true
         },
         "read_list": {
           "allowed": true,

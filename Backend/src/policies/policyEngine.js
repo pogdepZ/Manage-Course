@@ -4,13 +4,26 @@ const path = require('path');
 class PolicyEngine {
   constructor() {
     this.permissions = {};
+    this.fullConfig = {};
     this.loadPermissions();
   }
 
   loadPermissions() {
     const filePath = path.join(__dirname, '../../role-permissions.json');
     const data = JSON.parse(fs.readFileSync(filePath, 'utf8'));
+    this.fullConfig = data;
     this.permissions = data.roles;
+  }
+
+  getPermissions() {
+    return this.fullConfig;
+  }
+
+  updatePermissions(newConfig) {
+    const filePath = path.join(__dirname, '../../role-permissions.json');
+    fs.writeFileSync(filePath, JSON.stringify(newConfig, null, 2), 'utf8');
+    this.fullConfig = newConfig;
+    this.permissions = newConfig.roles;
   }
 
   can({ subject, action, resourceType, resource }) {
