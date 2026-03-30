@@ -16,6 +16,9 @@ class CourseRepository {
   }
 
   async findAllScoped(subject) {
+    if (subject.role === 'student') {
+      return Course.find({}).sort({ createdAt: -1 });
+    }
     const scopeFilter = await buildCourseScopeFilter(subject, this.enrollmentRepository);
     return Course.find(scopeFilter).sort({ createdAt: -1 });
   }
