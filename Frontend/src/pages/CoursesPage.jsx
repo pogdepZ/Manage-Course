@@ -143,7 +143,7 @@ export default function CoursesPage() {
                 {filtered.map((course) => (
                   <tr key={course._id || course.id}>
                     <td><strong>{course.title}</strong></td>
-                    <td style={{ color: 'var(--muted)', fontSize: '0.85rem' }}>{course.createdBy}</td>
+                    <td style={{ color: 'var(--muted)', fontSize: '0.85rem' }}>{course.createdBy?.name || course.createdBy || '-'}</td>
                     <td>{formatDate(course.updatedAt)}</td>
                     <td className="action-cell">
                       <Link to={`/app/courses/${course._id || course.id}`} className="link-button ghost-button">

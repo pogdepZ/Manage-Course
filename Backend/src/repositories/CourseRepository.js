@@ -17,17 +17,17 @@ class CourseRepository {
 
   async findAllScoped(subject) {
     if (subject.role === 'teacher') {
-      return Course.find({}).sort({ createdAt: -1 });
+      return Course.find({}).sort({ createdAt: -1 }).populate('createdBy', 'name').populate('teachers', 'name');
     }
 
     const scopeFilter = await buildCourseScopeFilter(subject, this.enrollmentRepository);
-    return Course.find(scopeFilter).sort({ createdAt: -1 });
+    return Course.find(scopeFilter).sort({ createdAt: -1 }).populate('createdBy', 'name').populate('teachers', 'name');
   }
 
   // Data scope is merged directly into MongoDB query to enforce row-level filtering.
   async findByIdScoped(id, subject) {
     const scopeFilter = await buildCourseScopeFilter(subject, this.enrollmentRepository);
-    return Course.findOne({ _id: toObjectId(id), ...scopeFilter });
+    return Course.findOne({ _id: toObjectId(id), ...scopeFilter }).populate('createdBy', 'name').populate('teachers', 'name');
   }
 
   async updateByIdScoped(id, updates, subject) {

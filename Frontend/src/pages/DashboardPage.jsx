@@ -99,7 +99,7 @@ export default function DashboardPage() {
               {recentCourses.map((course) => (
                 <tr key={course._id || course.id}>
                   <td>{course.title}</td>
-                  <td>{course.owner || course.createdBy || '-'}</td>
+                  <td>{course.owner || course.createdBy?.name || course.createdBy || '-'}</td>
                   <td>{formatDate(course.createdAt)}</td>
                   <td>
                     <Link to={`/app/courses/${course._id || course.id}`} className="text-link">
