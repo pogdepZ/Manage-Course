@@ -23,6 +23,19 @@ function courseRoutes(fastify, opts, done) {
     handler: courseController.getById
   });
 
+  fastify.post('/:courseId/teachers', {
+    preHandler: [
+      policyMiddleware({
+        resourceType: 'course',
+        action: 'update',
+        loadResource: async (request) => {
+          return request.server.container.repositories.courseRepository.findById(request.params.courseId);
+        }
+      })
+    ],
+    handler: courseController.addTeacher
+  });
+
   fastify.post('/', {
     preHandler: [
       policyMiddleware({ resourceType: 'course', action: 'create' })

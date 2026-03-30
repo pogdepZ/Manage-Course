@@ -18,6 +18,12 @@ class CourseController {
     reply.send(course);
   };
 
+  addTeacher = async (request, reply) => {
+    const { email } = request.body;
+    const course = await this.courseService.addTeacher(request.user, request.params.courseId, email);
+    reply.send(course);
+  };
+
   update = async (request, reply) => {
     const course = await this.courseService.update(request.user, request.params.courseId, request.body);
     reply.send(course);

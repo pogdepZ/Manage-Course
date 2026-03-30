@@ -24,7 +24,7 @@ function registerCoursePolicies(policyEngine) {
     evaluate: ({ subject, resource }) =>
       subject.role === 'teacher' &&
       resource &&
-      String(resource.createdBy) === String(subject.id)
+      (String(resource.createdBy) === String(subject.id) || (resource.teachers && resource.teachers.some(tId => String(tId) === String(subject.id))))
   });
 
   policyEngine.register({

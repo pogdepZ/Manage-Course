@@ -6,7 +6,7 @@ async function buildCourseScopeFilter(subject, enrollmentRepository) {
   }
 
   if (subject.role === 'teacher') {
-    return { createdBy: toObjectId(subject.id) };
+    return { $or: [{ createdBy: toObjectId(subject.id) }, { teachers: toObjectId(subject.id) }] };
   }
 
   if (subject.role === 'student') {
